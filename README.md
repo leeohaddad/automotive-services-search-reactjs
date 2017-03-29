@@ -25,24 +25,8 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
+### To-do
 
-          /*
-            <GoogleMapLoader
-              containerElement={
-                <div
-                  {...this.props}
-                  style={{
-                    height: "100%",
-                  }}
-                />
-              }
-              googleMapElement={
-                <GoogleMap
-                  ref={(map) => console.log(map)}
-                  defaultZoom={15}
-                  defaultCenter={{lat: this.state.lat, lng: this.state.lng}}
-                  onClick={() => alert("mapClick")}>
-                </GoogleMap>
-              }
-            />
-            */
+ - Implement auto search on Enter key press.
+ - Implement service details component to show more than just the name of the place.
+ - Implement map markers.

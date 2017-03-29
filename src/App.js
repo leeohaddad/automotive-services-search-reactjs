@@ -1,23 +1,7 @@
 import React, { Component } from 'react';
 import ReactList from 'react-list';
-import { GoogleMap, Marker, withGoogleMap } from "react-google-maps";
 import logo from './logo.svg';
 import './App.css';
-
-const apiKey = "AIzaSyDVvC4VGoi6XXBTrPHuBpJ7FYb_xoGvXTk";
-
-const SearchBoxExampleGoogleMap = withGoogleMap(props => (
-  <GoogleMap
-    ref={props.onMapMounted}
-    defaultZoom={15}
-    center={props.center}
-    onBoundsChanged={props.onBoundsChanged}
-  >
-    {props.markers.map((marker, index) => (
-      <Marker position={marker.position} key={index} />
-    ))}
-  </GoogleMap>
-));
 
 class App extends Component {
 
@@ -30,6 +14,7 @@ class App extends Component {
         lat: -23.5592668,
         lng: -46.7364076,
       },
+      map: null,
       markers: [],
       places: [
         {
@@ -45,51 +30,57 @@ class App extends Component {
         {name: "Oficina W"},{name: "Oficina X"},{name: "Oficina Y"},{name: "Oficina Z"},{name: "Oficina 1"},
         {name: "Oficina 2"},{name: "Oficina 3"},{name: "Oficina 4"},{name: "Oficina 5"},{name: "Oficina 6"},
         {name: "Oficina 7"},{name: "Oficina 8"},{name: "Oficina 9"}
-      ]
+      ],
+      service: null
     };
   }
 
   renderItem(index, key, that) {
-    return <div key={key} style={{backgroundColor: (key%2==0?'#fff':'#ddd')}}>{that.state.places[index].name}</div>;
+    return <div key={key} style={{backgroundColor: (key%2===0?'#fff':'#ddd')}}>{that.state.places[index].name}</div>;
   }
 
-  componentWillMount() {
-    // Create a map to show the results, and an info window to
-    // pop up if the user clicks on the place marker.
-    // var pyrmont = new window.google.maps.LatLng(-33.8665, 151.1956);
-
-    // var map = new window.google.maps.Map(document.getElementById('placesMap'), {
-    //   center: pyrmont,
-    //   zoom: 15,
-    //   scrollwheel: false
-    // });
-    // var infowindow = new window.google.maps.InfoWindow();
-    // var service = new window.google.maps.places.PlacesService(map);
+  componentDidMount() {
+    var pMap = new window.google.maps.Map(document.getElementById('map'), {
+      center: this.state.center,
+      zoom: 15
+    });
+    this.setState({ map: pMap });
   }
 
   requestNearbyServices(pLat,pLng) {
-    
-    var baseUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-    var requestUrl = baseUrl
-      + "?key=" + apiKey
-      + "&location=" + pLat + "," + pLng
-      + "&radius=1000"
-      + "&rankBy=distance"
-      + "&type=car_repair";
+    var myLocation = new window.google.maps.LatLng(pLat,pLng);
+    if (this.state.map == null) {
+      var pMap = new window.google.maps.Map(document.getElementById('map'), {
+        center: myLocation,
+        zoom: 15
+      });
+      this.setState({ map: pMap });
+    }
+    else {
+      this.state.map.setCenter(myLocation);
+      this.state.map.setZoom(15);
+    }
+    var request = {
+      location: myLocation,
+      radius: '2000',
+      types: ['car_repair']
+    };
+    if (this.state.service == null) {
+      var pService = new window.google.maps.places.PlacesService(this.state.map);
+      this.setState({ service: pService });
+    } 
+    this.state.service.nearbySearch(request, (results, status) => this.onNearbySearchResults(results,status,this));
+  }
 
-    console.log(requestUrl);
-
-    var that = this;
-    fetch(requestUrl) 
-      .then(response => response.json()
-        .then(data => ({
-          data: data,
-          status: response.status
-        }))
-        .then(res => {
-          that.setState({ places: res.data.results });
-        })
-      );
+  onNearbySearchResults(results, status, that) {
+    if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+      // for (var i = 0; i < results.length; i++) {
+      //   var place = results[i];
+      //   createMarker(results[i]);
+      // }
+      console.log(results);
+      that.setState({ places: results });
+    }
   }
 
   onSubmitCEP() {
@@ -127,12 +118,13 @@ class App extends Component {
     });
   }
 
-  handleMapMounted(map) {
-    this._map = map;
+  handleMapMounted(pMap) {
+    this._map = pMap;
+    this.setState({ map: pMap });
   }
 
-  handleSearchBoxMounted(searchBox) {
-    this._searchBox = searchBox;
+  handleSearchBoxMounted(pSearchBox) {
+    this._searchBox = pSearchBox;
   }
 
   handlePlacesChanged() {
@@ -168,22 +160,7 @@ class App extends Component {
           <input id="submitCEP" type="submit" onClick={()=>this.onSubmitCEP()} value="Buscar oficinas!" />
         </div>
         <div className="App-searchResults">
-          <div id="maps" className="App-placesMap">
-            <SearchBoxExampleGoogleMap
-              containerElement={
-                <div style={{ height: `100%` }} />
-              }
-              mapElement={
-                <div style={{ height: `100%` }} />
-              }
-              center={this.state.center}
-              onMapMounted={this.handleMapMounted}
-              onBoundsChanged={this.handleBoundsChanged}
-              onSearchBoxMounted={this.handleSearchBoxMounted}
-              bounds={this.state.bounds}
-              onPlacesChanged={this.handlePlacesChanged}
-              markers={this.state.markers}
-      />
+          <div id="map" className="App-placesMap">
           </div>
           <div className="App-placesList" style={{overflow: 'auto'}}>
             <div  className="App-listTitle">LISTA DE OFICINAS NAS PROXIMIDADES:</div>

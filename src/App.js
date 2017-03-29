@@ -111,16 +111,16 @@ class App extends Component {
   handleSearchBoxMounted = this.handleSearchBoxMounted.bind(this);
   handlePlacesChanged = this.handlePlacesChanged.bind(this);
 
+  handleMapMounted(pMap) {
+    this._map = pMap;
+    this.setState({ map: pMap });
+  }
+
   handleBoundsChanged() {
     this.setState({
       bounds: this._map.getBounds(),
       center: this._map.getCenter(),
     });
-  }
-
-  handleMapMounted(pMap) {
-    this._map = pMap;
-    this.setState({ map: pMap });
   }
 
   handleSearchBoxMounted(pSearchBox) {
@@ -144,6 +144,12 @@ class App extends Component {
     });
   }
 
+  handleKeyPress(target) {
+    if (target.charCode==13) {
+      this.onSubmitCEP();    
+    }
+  }
+
   render() {
     return (
       <div className="App">
@@ -155,7 +161,7 @@ class App extends Component {
           Para iniciar, preencha o campo abaixo com o <code>CEP</code> ou <code>endereço</code> desejado.
         </p>
         <div className="App-getAddress">
-          <input type="text" value={this.state.currentCEP} placeholder="Digite seu CEP/endereço aqui!" style={{width: '70%', textAlign: 'center'}} onChange={(event) => this.handleCurrentCEPChange(event,this)} />
+          <input type="text" value={this.state.currentCEP} placeholder="Digite seu CEP/endereço aqui!" style={{width: '70%', textAlign: 'center'}} onChange={(event) => this.handleCurrentCEPChange(event,this)} onKeyPress={(target) => this.handleKeyPress(target)} />
           <br/><br/>
           <input id="submitCEP" type="submit" onClick={()=>this.onSubmitCEP()} value="Buscar oficinas!" />
         </div>

@@ -27,6 +27,7 @@ Your app is ready to be deployed!
 
 ### To-do
 
- - Implement auto search on Enter key press.
  - Implement service details component to show more than just the name of the place.
  - Implement map markers.
+ - Design better UI for mobile portrait.
+ - Let the user choose the radius.

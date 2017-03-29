@@ -94,7 +94,7 @@ class App extends Component {
 
   onSubmitCEP() {
     var that = this;
-    fetch("http://maps.google.com/maps/api/geocode/json?address=" + this.state.currentCEP) 
+    fetch("https://maps.google.com/maps/api/geocode/json?address=" + this.state.currentCEP) 
       .then(response => response.json()
         .then(data => ({
           data: data,

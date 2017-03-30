@@ -27,10 +27,11 @@ Your app is ready to be deployed!
 
 ### To-do
 
- - Implement service details component to show more than just the name of the place.
- - Implement map markers.
- - Design better UI for mobile portrait.
  - Let the user choose if sorting by rank or distance.
  - Let the user choose the radius.
+ - Handle marker click and show information in a more elegant way than alert.
+ - Design better UI for mobile portrait.
+ - Handle user input errors.
+ - Handle Google database failures like incomplete vicinities such as "Brazil" or "São Paulo".
  - Remove unused code.
  - Add more comments to the code.

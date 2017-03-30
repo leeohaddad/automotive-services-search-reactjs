@@ -21,10 +21,6 @@ class App extends Component {
     };
   }
 
-  renderItem(index, key, that) {
-    return <div key={key} style={{backgroundColor: (key%2===0?'#fff':'#ddd')}}>{that.state.places[index].name}</div>;
-  }
-
   componentDidMount() {
     var pMap = new window.google.maps.Map(document.getElementById('map'), {
       center: this.state.initialLocation,
@@ -64,7 +60,6 @@ class App extends Component {
       for (var i = 0; i < results.length; i++) {
         this.createMarker(results[i]);
       }
-      console.log(results);
       that.setState({ places: results });
     }
   }
@@ -161,6 +156,44 @@ class App extends Component {
     }
   }
 
+  renderPlaceOpening(opening, index) {
+    if (opening == null)
+      return '';
+    else
+      return (
+        <div>
+          <br/>
+          {(this.state.places[index].opening_hours.open_now ? "Aberto Agora" : "Fechado Agora")}
+        </div>
+      );
+  }
+
+  renderPlaceVicinity(vicinity, index) {
+    if (vicinity == null || vicinity==='')
+      return '';
+    else
+      return (
+        <div>
+          <br/>
+          Localização: {this.state.places[index].vicinity}
+        </div>
+      );
+  }
+
+  renderListItemComponent(index, key) {
+    return (
+      <div key={key} style={{backgroundColor: (key%2===0?'#fff':'#ddd'), verticalAlign: 'middle'}}>
+        <div style={{width:'90%', margin: '0 auto'}}>
+          <br/>
+          <h3>{this.state.places[index].name}</h3>
+          {this.renderPlaceOpening(this.state.places[index].opening_hours, index)}
+          {this.renderPlaceVicinity(this.state.places[index].vicinity, index)}
+          <br/>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="App">
@@ -180,10 +213,10 @@ class App extends Component {
           <div id="map" className="App-placesMap">
           </div>
           <div className="App-placesList" style={{overflow: 'auto'}}>
-            <div  className="App-listTitle">LISTA DE OFICINAS NAS PROXIMIDADES:</div>
+            <div  className="App-listTitle">LISTA DE OFICINAS NAS PROXIMIDADES</div>
             <ReactList 
               length={this.state.places.length}
-              itemRenderer={(index, key) => this.renderItem(index,key,this)}
+              itemRenderer={(index, key) => this.renderListItemComponent(index,key,this)}
               type='uniform' />
           </div>
         </div>

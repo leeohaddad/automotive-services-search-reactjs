@@ -177,53 +177,69 @@ class App extends Component {
     }
   }
 
-  renderPlaceRating(rating, index) {
-    if (rating == null)
+  renderPlaceName(place, index) {
+    if (place.name == null)
       return '';
     else
       return (
-        <div>
-          <br/>
-          Avaliação: {this.state.places[index].rating}
-        </div>
+        <h3>
+          Nome: {place.name}
+        </h3>
       );
   }
 
-  renderPlaceOpening(opening, index) {
-    if (opening == null)
+  renderPlaceRating(place, index) {
+    if (place.rating == null)
       return '';
     else
       return (
-        <div>
-          <br/>
-          {(this.state.places[index].opening_hours.open_now ? "Aberto Agora" : "Fechado Agora")}
-        </div>
+        <p>
+          Avaliação: {place.rating}
+        </p>
       );
   }
 
-  renderPlaceVicinity(vicinity, index) {
-    if (vicinity == null || vicinity==='')
+  renderPlaceOpening(place, index) {
+    if (place.opening_hours == null)
       return '';
     else
       return (
-        <div>
-          <br/>
-          Localização: {this.state.places[index].vicinity}
-        </div>
+        <p>
+          {(place.opening_hours.open_now ? "Aberto Agora" : "Fechado Agora")}
+        </p>
+      );
+  }
+
+  renderPlaceVicinity(place, index) {
+    if (place.vicinity == null || place.vicinity==='')
+      return '';
+    else
+      return (
+        <p>
+          Localização: {place.vicinity}
+        </p>
       );
   }
 
   renderListItemComponent(index, key) {
+    var places = this.state.places.slice();
+    var thisPlace = places[index];
+    var name = this.renderPlaceName(thisPlace, index);
+    if (name === '')
+      return '';
+    var rating = this.renderPlaceRating(thisPlace, index);
+    var opening = this.renderPlaceOpening(thisPlace, index);
+    var vicinity = this.renderPlaceVicinity(thisPlace, index);
     return (
       <div key={key} >
         <div style={{backgroundColor: '#000'}}><br/></div>
         <div style={{verticalAlign: 'middle'}}>
           <div style={{width:'90%', margin: '0 auto'}}>
             <br/>
-            <h3>{this.state.places[index].name}</h3>
-            {this.renderPlaceRating(this.state.places[index].rating, index)}
-            {this.renderPlaceOpening(this.state.places[index].opening_hours, index)}
-            {this.renderPlaceVicinity(this.state.places[index].vicinity, index)}
+            {name}
+            {rating}
+            {opening}
+            {vicinity}
             <br/>
           </div>
         </div>
@@ -261,7 +277,7 @@ class App extends Component {
             <ReactList 
               length={this.state.places.length}
               itemRenderer={(index, key) => this.renderListItemComponent(index,key,this)}
-              type='uniform' />
+              type='variable' />
           </div>
         </div>
       </div>

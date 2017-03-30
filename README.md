@@ -27,10 +27,13 @@ Your app is ready to be deployed!
 
 ### To-do
 
- - Let the user choose the radius.
  - Handle marker click and show information in a more elegant way than alert.
- - Design better UI for mobile portrait.
- - Handle user input errors.
+ - Keep user's decision about the sorting method when requesting new informations to the api.
+ - Design better UI for the places list item component.
+ - Design better app UI for mobile devices portrait mode.
+ - Handle user input errors (like empty address or alpha chars in radius).
  - Handle Google database failures like incomplete vicinities such as "Brazil" or "São Paulo".
+ - Handle Google api failures like places that don't get returned after you increase radius.
+ - Discover if Google's distance rank top varies with radius because it is wrong or because places disappeared.
  - Remove unused code.
  - Add more comments to the code.

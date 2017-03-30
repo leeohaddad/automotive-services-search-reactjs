@@ -17,6 +17,9 @@ class App extends Component {
       map: null,
       markers: [],
       places: [],
+      placesByDistance: [],
+      placesByRating: [],
+      radius: 2000,
       service: null
     };
   }
@@ -30,6 +33,7 @@ class App extends Component {
   }
 
   requestNearbyServices(pLat,pLng) {
+    var that = this;
     var myLocation = new window.google.maps.LatLng(pLat,pLng);
     if (this.state.map == null) {
       var pMap = new window.google.maps.Map(document.getElementById('map'), {
@@ -44,20 +48,27 @@ class App extends Component {
     }
     var request = {
       location: myLocation,
-      radius: '2000',
+      radius: that.state.radius,
       types: ['car_repair']
     };
     if (this.state.service == null) {
       var pService = new window.google.maps.places.PlacesService(this.state.map);
       this.setState({ service: pService });
-    } 
+    }
     this.state.service.nearbySearch(request, (results, status) => this.onNearbySearchResults(results,status,this));
   }
 
   onNearbySearchResults(results, status) {
+    var i;
+    this.setState({ places: [] });
+    this.setState({ placesByDistance: [] });
+    this.setState({ placesByRating: [] });
+    for (i = 0; i < this.state.markers.length; i++) {
+      this.state.markers[i].setMap(null);
+    }
+    this.setState({ markers: [] });
     if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-      this.setState({ markers: [] });
-      for (var i = 0; i < results.length; i++) {
+      for (i = 0; i < results.length; i++) {
         this.createMarker(results[i]);
       }
       this.setState({ places: results });
@@ -77,6 +88,10 @@ class App extends Component {
   }
 
   sortPlacesListByRating() {
+    if (this.state.placesByRating.length > 0) {
+      this.setState({ places: this.state.placesByRating });
+      return;
+    }
     var res = this.state.places.slice();
     res.sort(function (a, b) {
       if (a.rating == null)
@@ -131,6 +146,10 @@ class App extends Component {
 
   handleCurrentCEPChange(event,pthis) {
     pthis.setState({ currentCEP: event.target.value });
+  }
+
+  handleRadiusChange(event,pthis) {
+    pthis.setState({ radius: event.target.value });
   }
 
   handleMapMounted = this.handleMapMounted.bind(this);
@@ -259,6 +278,8 @@ class App extends Component {
         </p>
         <div className="App-getAddress">
           <input type="text" value={this.state.currentCEP} placeholder="Digite seu CEP/endereço aqui!" style={{width: '70%', textAlign: 'center'}} onChange={(event) => this.handleCurrentCEPChange(event,this)} onKeyPress={(target) => this.handleKeyPress(target)} />
+          <br/><br/>
+          Raio de busca (em metros): <input type="text" value={this.state.radius} placeholder="Raio" style={{width: '10%', textAlign: 'center'}} onChange={(event) => this.handleRadiusChange(event,this)} onKeyPress={(target) => this.handleKeyPress(target)} />
           <br/><br/>
           <input id="submitCEP" type="submit" onClick={()=>this.onSubmitCEP()} value="Buscar oficinas!" />
         </div>

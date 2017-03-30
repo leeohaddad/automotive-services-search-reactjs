@@ -20,7 +20,8 @@ class App extends Component {
       placesByDistance: [],
       placesByRating: [],
       radius: 2000,
-      service: null
+      service: null,
+      sortingByRating: false
     };
   }
 
@@ -71,8 +72,10 @@ class App extends Component {
       for (i = 0; i < results.length; i++) {
         this.createMarker(results[i]);
       }
-      this.setState({ places: results });
       this.setState({ placesByDistance: results.slice() });
+      this.setState({ places: results });
+      if (this.state.sortingByRating)
+        this.sortPlacesListByRating();
     }
   }
 
@@ -88,6 +91,7 @@ class App extends Component {
   }
 
   sortPlacesListByRating() {
+    this.setState({ sortingByRating: true });
     if (this.state.placesByRating.length > 0) {
       this.setState({ places: this.state.placesByRating });
       return;
@@ -105,6 +109,7 @@ class App extends Component {
   }
 
   sortPlacesListByDistance() {
+    this.setState({ sortingByRating: false });
     this.setState({ places: [] });
     this.setState({ places: this.state.placesByDistance });
   }

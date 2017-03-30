@@ -118,8 +118,6 @@ class App extends Component {
       title: that.buildMarkerText(markerDetails)
     });
     marker.addListener('click', function() {
-      that.state.map.setZoom((that.state.map.getZoom() < 20 ? 20 : that.state.map.getZoom()));
-      that.state.map.setCenter(marker.getPosition());
       alert(marker.title);
     });
     this.state.markers.push(marker);
@@ -240,6 +238,11 @@ class App extends Component {
       );
   }
 
+  zoomInMap (thisPlace) {
+    this.state.map.setZoom((this.state.map.getZoom() < 20 ? 20 : this.state.map.getZoom()));
+    this.state.map.setCenter(thisPlace.geometry.location);
+  }
+
   renderListItemComponent(index, key) {
     var places = this.state.places.slice();
     var thisPlace = places[index];
@@ -259,6 +262,9 @@ class App extends Component {
             {rating}
             {opening}
             {vicinity}
+            <div>
+              <input type="submit" onClick={()=>this.zoomInMap(thisPlace)} value="VER NO MAPA" />
+            </div>
             <br/>
           </div>
         </div>
@@ -281,7 +287,7 @@ class App extends Component {
           <br/><br/>
           Raio de busca (em metros): <input type="text" value={this.state.radius} placeholder="Raio" style={{width: '10%', textAlign: 'center'}} onChange={(event) => this.handleRadiusChange(event,this)} onKeyPress={(target) => this.handleKeyPress(target)} />
           <br/><br/>
-          <input id="submitCEP" type="submit" onClick={()=>this.onSubmitCEP()} value="Buscar oficinas!" />
+          <input id="submitCEP" type="submit" onClick={()=>this.onSubmitCEP()} value="BUSCAR OFICINAS" />
         </div>
         <div className="App-searchResults">
           <div id="map" className="App-placesMap">

@@ -10,27 +10,13 @@ class App extends Component {
     this.state = {
       currentCEP:"",
       bounds: null,
-      center: {
+      initialLocation: {
         lat: -23.5592668,
         lng: -46.7364076,
       },
       map: null,
       markers: [],
-      places: [
-        {
-          name: "Oficina A"
-        },
-        {
-          name: "Oficina B"
-        },
-        {name: "Oficina C"},{name: "Oficina D"},{name: "Oficina E"},{name: "Oficina F"},{name: "Oficina G"},
-        {name: "Oficina H"},{name: "Oficina I"},{name: "Oficina J"},{name: "Oficina K"},{name: "Oficina L"},
-        {name: "Oficina M"},{name: "Oficina N"},{name: "Oficina O"},{name: "Oficina P"},{name: "Oficina Q"},
-        {name: "Oficina R"},{name: "Oficina S"},{name: "Oficina T"},{name: "Oficina U"},{name: "Oficina V"},
-        {name: "Oficina W"},{name: "Oficina X"},{name: "Oficina Y"},{name: "Oficina Z"},{name: "Oficina 1"},
-        {name: "Oficina 2"},{name: "Oficina 3"},{name: "Oficina 4"},{name: "Oficina 5"},{name: "Oficina 6"},
-        {name: "Oficina 7"},{name: "Oficina 8"},{name: "Oficina 9"}
-      ],
+      places: [],
       service: null
     };
   }
@@ -41,7 +27,7 @@ class App extends Component {
 
   componentDidMount() {
     var pMap = new window.google.maps.Map(document.getElementById('map'), {
-      center: this.state.center,
+      center: this.state.initialLocation,
       zoom: 15
     });
     this.setState({ map: pMap });
@@ -74,13 +60,38 @@ class App extends Component {
 
   onNearbySearchResults(results, status, that) {
     if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-      // for (var i = 0; i < results.length; i++) {
-      //   var place = results[i];
-      //   createMarker(results[i]);
-      // }
+      this.setState({ markers: [] });
+      for (var i = 0; i < results.length; i++) {
+        this.createMarker(results[i]);
+      }
       console.log(results);
       that.setState({ places: results });
     }
+  }
+
+  buildMarkerText(markerDetails) {
+    var returnValue = "Nome: " + markerDetails.name + "\n";
+    if (markerDetails.opening_hours != null)
+      returnValue += "Aberto agora: " + (markerDetails.opening_hours.open_now ? "Sim" : "Não") + "\n";
+    if (markerDetails.vicinity != null)
+      returnValue += "Localização: " + markerDetails.vicinity + "\n";
+    return returnValue;
+  }
+
+  createMarker(markerDetails) {
+    var that = this;
+    var marker = new window.google.maps.Marker({
+      position: markerDetails.geometry.location,
+      map: that.state.map,
+      label: markerDetails.name,
+      title: that.buildMarkerText(markerDetails)
+    });
+    marker.addListener('click', function() {
+      that.state.map.setZoom((that.state.map.getZoom() < 20 ? 20 : that.state.map.getZoom()));
+      that.state.map.setCenter(marker.getPosition());
+      alert(marker.title);
+    });
+    this.state.markers.push(marker);
   }
 
   onSubmitCEP() {
@@ -145,7 +156,7 @@ class App extends Component {
   }
 
   handleKeyPress(target) {
-    if (target.charCode==13) {
+    if (target.charCode===13) {
       this.onSubmitCEP();    
     }
   }

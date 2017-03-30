@@ -27,8 +27,8 @@ Your app is ready to be deployed!
 
 ### To-do
 
- - Let the user choose if sorting by rank or distance.
  - Let the user choose the radius.
+ - Solve "ReactList failed to reach a stable state." bug.
  - Handle marker click and show information in a more elegant way than alert.
  - Design better UI for mobile portrait.
  - Handle user input errors.

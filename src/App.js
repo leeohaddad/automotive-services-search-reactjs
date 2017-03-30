@@ -54,23 +54,44 @@ class App extends Component {
     this.state.service.nearbySearch(request, (results, status) => this.onNearbySearchResults(results,status,this));
   }
 
-  onNearbySearchResults(results, status, that) {
+  onNearbySearchResults(results, status) {
     if (status === window.google.maps.places.PlacesServiceStatus.OK) {
       this.setState({ markers: [] });
       for (var i = 0; i < results.length; i++) {
         this.createMarker(results[i]);
       }
-      that.setState({ places: results });
+      this.setState({ places: results });
+      this.setState({ placesByDistance: results.slice() });
     }
   }
 
   buildMarkerText(markerDetails) {
     var returnValue = "Nome: " + markerDetails.name + "\n";
+    if (markerDetails.rating != null)
+      returnValue += "Avaliação: " + markerDetails.rating + "\n";
     if (markerDetails.opening_hours != null)
       returnValue += "Aberto agora: " + (markerDetails.opening_hours.open_now ? "Sim" : "Não") + "\n";
     if (markerDetails.vicinity != null)
       returnValue += "Localização: " + markerDetails.vicinity + "\n";
     return returnValue;
+  }
+
+  sortPlacesListByRating() {
+    var res = this.state.places.slice();
+    res.sort(function (a, b) {
+      if (a.rating == null)
+        return 1;
+      if (b.rating == null)
+        return -1;
+      return b.rating - a.rating;
+    });
+    this.setState({ places: res });
+    this.setState({ placesByRating: res });
+  }
+
+  sortPlacesListByDistance() {
+    this.setState({ places: [] });
+    this.setState({ places: this.state.placesByDistance });
   }
 
   createMarker(markerDetails) {
@@ -156,6 +177,18 @@ class App extends Component {
     }
   }
 
+  renderPlaceRating(rating, index) {
+    if (rating == null)
+      return '';
+    else
+      return (
+        <div>
+          <br/>
+          Avaliação: {this.state.places[index].rating}
+        </div>
+      );
+  }
+
   renderPlaceOpening(opening, index) {
     if (opening == null)
       return '';
@@ -182,13 +215,17 @@ class App extends Component {
 
   renderListItemComponent(index, key) {
     return (
-      <div key={key} style={{backgroundColor: (key%2===0?'#fff':'#ddd'), verticalAlign: 'middle'}}>
-        <div style={{width:'90%', margin: '0 auto'}}>
-          <br/>
-          <h3>{this.state.places[index].name}</h3>
-          {this.renderPlaceOpening(this.state.places[index].opening_hours, index)}
-          {this.renderPlaceVicinity(this.state.places[index].vicinity, index)}
-          <br/>
+      <div key={key} >
+        <div style={{backgroundColor: '#000'}}><br/></div>
+        <div style={{verticalAlign: 'middle'}}>
+          <div style={{width:'90%', margin: '0 auto'}}>
+            <br/>
+            <h3>{this.state.places[index].name}</h3>
+            {this.renderPlaceRating(this.state.places[index].rating, index)}
+            {this.renderPlaceOpening(this.state.places[index].opening_hours, index)}
+            {this.renderPlaceVicinity(this.state.places[index].vicinity, index)}
+            <br/>
+          </div>
         </div>
       </div>
     );
@@ -213,7 +250,14 @@ class App extends Component {
           <div id="map" className="App-placesMap">
           </div>
           <div className="App-placesList" style={{overflow: 'auto'}}>
-            <div  className="App-listTitle">LISTA DE OFICINAS NAS PROXIMIDADES</div>
+            <div className="App-listTitle">
+              LISTA DE OFICINAS NAS PROXIMIDADES
+            </div>
+            <div className="App-listTitle">
+              <input id="sortByRating" type="submit" onClick={()=>this.sortPlacesListByRating()} value="Ordenar por avaliações!" />
+              <p></p>
+              <input id="sortByDistance" type="submit" onClick={()=>this.sortPlacesListByDistance()} value="Ordenar por distância!" />
+            </div>
             <ReactList 
               length={this.state.places.length}
               itemRenderer={(index, key) => this.renderListItemComponent(index,key,this)}
